@@ -8,9 +8,9 @@ plugins {
 archivesBaseName = getArtifactID("fabric")
 
 loom {
-    mixin.defaultRefmapName = "yourmod.mixins.refmap.json"
+    mixin.defaultRefmapName = "spellcore.mixins.refmap.json"
 
-    accessWidenerPath = file("src/main/resources/yourmod.accesswidener")
+    accessWidenerPath = file("src/main/resources/spellcore.accesswidener")
 
     runs {
         client {
@@ -65,10 +65,6 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     compileOnly project(":Common")
 
-    modImplementation "at.petra-k.paucal:paucal-fabric-$minecraftVersion:$paucalVersion"
-    modImplementation("at.petra-k.hexcasting:hexcasting-fabric-$minecraftVersion:$hexcastingVersion") {
-        exclude module: "phosphor"
-    }
     modImplementation "vazkii.patchouli:Patchouli:$minecraftVersion-$patchouliVersion-FABRIC"
 
     modImplementation "me.zeroeightsix:fiber:$fiberVersion"
@@ -83,6 +79,9 @@ dependencies {
     modImplementation "io.github.tropheusj:serialization-hooks:$serializationHooksVersion"
     include "io.github.tropheusj:serialization-hooks:$serializationHooksVersion"
 
+    modImplementation "com.terraformersmc:modmenu:$modmenuVersion"
+    include "com.terraformersmc:modmenu:$modmenuVersion"
+
     // Optional integrations
 
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:$reiVersion"
@@ -93,10 +92,10 @@ dependencies {
 
     modImplementation "dev.emi:emi:${emiVersion}"
 
-    modImplementation "maven.modrinth:gravity-api:$gravityApiVersion"
-    modApi("com.github.Virtuoel:Pehkui:${pehkuiVersion}", {
-        exclude group: "net.fabricmc.fabric-api"
-    })
+//    modImplementation "maven.modrinth:gravity-api:$gravityApiVersion"
+//    modApi("com.github.Virtuoel:Pehkui:${pehkuiVersion}", {
+//        exclude group: "net.fabricmc.fabric-api"
+//    })
 
     implementation 'org.jetbrains:annotations:23.0.0'
 

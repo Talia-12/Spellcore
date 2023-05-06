@@ -6,7 +6,7 @@ import re # parsing
 import os # listdir
 
 # TO USE:
-# python doc/collate_data.py /EmptyHexCastingAddon/Common/src/main/resources /EmptyHexCastingAddon/doc/HexCastingResources yourmod yourmodbook doc/template.html doc/out.html
+# python doc/collate_data.py /Spellcore/Common/src/main/resources /Spellcore/doc/HexCastingResources yourmod yourmodbook doc/template.html doc/out.html
 
 # extra info :(
 lang = "en_us"
@@ -195,7 +195,7 @@ def do_format(root_data, obj, *names):
 def identity(x): return x
 
 pattern_pat = re.compile(r'HexPattern\.fromAngles\("([qweasd]+)", HexDir\.(\w+)\),\s*modLoc\("([^"]+)"\)(?:[^val]*[^\(](true)\))?')
-pattern_stubs = [(None, "yourmod/name/here/common/casting/Patterns.kt")]
+pattern_stubs = [(None, "ram/talia/Spellcore/common/casting/Patterns.kt")]
 def fetch_patterns(root_data):
 	registry = {}
 	for loader, stub in pattern_stubs:

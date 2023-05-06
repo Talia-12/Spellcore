@@ -90,7 +90,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'yourmod'
+            property 'forge.enabledGameTestNamespaces', 'spellcore'
 
             mods {
                 create(modID) {
@@ -112,7 +112,7 @@ minecraft {
             args '--mod', modID, '--all', '--output', file('../Common/src/generated/resources/'), '--existing', file('../Common/src/main/resources/')
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property 'yourmod.xplat_datagen', 'true'
+            property 'spellcore.xplat_datagen', 'true'
             mods {
                 create(modID) {
                     source sourceSets.main
@@ -129,7 +129,7 @@ minecraft {
             args '--mod', modID, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property 'yourmod.forge_datagen', 'true'
+            property 'spellcore.forge_datagen', 'true'
             mods {
                 create(modID) {
                     source sourceSets.main
@@ -171,11 +171,6 @@ dependencies {
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    compileOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
-    runtimeOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
-    compileOnly fg.deobf("${modID}:hexcasting-forge-$minecraftVersion:$hexcastingVersion")
-    runtimeOnly fg.deobf("${modID}:hexcasting-forge-$minecraftVersion:$hexcastingVersion")
-
     compileOnly fg.deobf("vazkii.patchouli:Patchouli:$minecraftVersion-$patchouliVersion")
     runtimeOnly fg.deobf("vazkii.patchouli:Patchouli:$minecraftVersion-$patchouliVersion")
 
@@ -184,10 +179,6 @@ dependencies {
 
     testAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    testCompileOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
-    testRuntimeOnly fg.deobf("at.petra-k.paucal:paucal-forge-$minecraftVersion:$paucalVersion")
-    testCompileOnly fg.deobf("${modID}:hexcasting-forge-$minecraftVersion:$hexcastingVersion")
-    testRuntimeOnly fg.deobf("${modID}:hexcasting-forge-$minecraftVersion:$hexcastingVersion")
     testCompileOnly fg.deobf("vazkii.patchouli:Patchouli:$minecraftVersion-$patchouliVersion")
     testRuntimeOnly fg.deobf("vazkii.patchouli:Patchouli:$minecraftVersion-$patchouliVersion")
 
@@ -196,10 +187,10 @@ dependencies {
 }
 
 mixin {
-    add sourceSets.main, "yourmod.mixins.refmap.json"
-    add sourceSets.test, "yourmod.test.mixins.refmap.json"
-    config "yourmodplat.mixins.json"
-    config "yourmod_forge.mixins.json"
+    add sourceSets.main, "spellcore.mixins.refmap.json"
+    add sourceSets.test, "spellcore.test.mixins.refmap.json"
+    config "spellcoreplat.mixins.json"
+    config "spellcore_forge.mixins.json"
 }
 
 tasks.withType(JavaCompile) {

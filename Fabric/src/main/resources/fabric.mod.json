@@ -1,16 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "yourmod",
+  "id": "spellcore",
   "version": "${version}",
 
-  "name": "Your Mod",
-  "description": "Empty Addon mod for Hex Casting to build into whatever you want it to be.",
+  "name": "Spellcore",
+  "description": "This is my own shot at a magic mod in Minecraft with a more atomic feel. This one is going to be based around cellular automota, Game of Life esque, though more complicated.",
   "authors": [
     "Talia"
   ],
   "contact": {
     "homepage": "",
-    "sources": "https://github.com/Talia-12/EmptyHexCastingAddon"
+    "sources": "https://github.com/Talia-12/Spellcore"
   },
 
   "license": "MIT",
@@ -19,26 +19,26 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      {"adapter": "kotlin", "value": "yourmod.name.here.fabric.FabricYourModInitializer"}
+      {"adapter": "kotlin", "value": "ram.talia.spellcore.fabric.FabricSpellcoreInitializer"}
     ],
     "client": [
-      {"adapter": "kotlin", "value": "yourmod.name.here.fabric.FabricYourModClientInitializer"}
+      {"adapter": "kotlin", "value": "ram.talia.spellcore.fabric.FabricSpellcoreClientInitializer"}
     ],
     "rei_client": [
-      "yourmod.name.here.fabric.interop.rei.YourModREIPlugin"
+      "ram.talia.spellcore.fabric.interop.rei.SpellcoreREIPlugin"
     ],
     "emi": [
-      "yourmod.name.here.fabric.interop.emi.YourModEMIPlugin"
+      "ram.talia.spellcore.fabric.interop.emi.SpellcoreEMIPlugin"
     ],
     "modmenu": [
-      "yourmod.name.here.fabric.interop.ModMenuInterop"
+      "ram.talia.spellcore.fabric.interop.ModMenuInterop"
     ]
   },
   "mixins": [
-    "yourmodplat.mixins.json",
-    "yourmod.mixins.json"
+    "spellcoreplat.mixins.json",
+    "spellcore.mixins.json"
   ],
-  "accessWidener": "yourmod.accesswidener",
+  "accessWidener": "spellcore.accesswidener",
 
   "depends": {
     "minecraft": "=1.19.2",
@@ -47,9 +47,7 @@
     "fabric": ">=0.64",
     "fabric-language-kotlin": ">=1.7.4+kotlin.1.6.21",
     "cardinal-components": ">=5.0.2",
-    "patchouli": ">=1.19.2-77",
-    "paucal": "0.5.x",
-    "hexcasting": ">=0.10.3"
+    "patchouli": ">=1.19.2-77"
   },
 
   "custom": {
