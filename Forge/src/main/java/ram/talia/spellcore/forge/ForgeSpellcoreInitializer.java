@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
+import ram.talia.spellcore.common.lib.SpellcoreEntities;
 import thedarkcolour.kotlinforforge.KotlinModLoadingContext;
 import ram.talia.spellcore.api.SpellcoreAPI;
 import ram.talia.spellcore.api.config.SpellcoreConfig;
@@ -42,6 +43,7 @@ public class ForgeSpellcoreInitializer {
 	}
 	
 	private static void initRegistry () {
+		bind(Registry.ENTITY_TYPE_REGISTRY, SpellcoreEntities::registerEntities);
 	}
 	
 	private static void initListeners () {

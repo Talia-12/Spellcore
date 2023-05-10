@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceLocation
 import ram.talia.spellcore.api.SpellcoreAPI
+import ram.talia.spellcore.common.lib.SpellcoreEntities
 import java.util.function.BiConsumer
 
 object FabricSpellcoreInitializer : ModInitializer {
@@ -20,7 +21,9 @@ object FabricSpellcoreInitializer : ModInitializer {
 
     private fun initListeners() {}
 
-    private fun initRegistries() {}
+    private fun initRegistries() {
+        SpellcoreEntities.registerEntities(bind(Registry.ENTITY_TYPE))
+    }
 
 
     private fun <T> bind(registry: Registry<in T>): BiConsumer<T, ResourceLocation> =
