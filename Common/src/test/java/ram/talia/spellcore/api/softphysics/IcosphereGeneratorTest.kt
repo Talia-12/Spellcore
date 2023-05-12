@@ -9,7 +9,7 @@ import ram.talia.spellcore.api.softphysics.IcosphereGenerator.icosphere
 class IcosphereGeneratorTest {
 
     @Test
-    fun testIcosphere() {
+    fun icosphere() {
         println(icosphere(0))
         println(icosphere(1))
         println(icosphere(2))

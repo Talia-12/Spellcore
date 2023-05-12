@@ -8,10 +8,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import ram.talia.spellcore.api.SpellcoreAPI
-import ram.talia.spellcore.api.div
-import ram.talia.spellcore.api.minus
-import ram.talia.spellcore.api.plus
+import ram.talia.spellcore.api.*
 import ram.talia.spellcore.api.softphysics.*
 import ram.talia.spellcore.common.lib.SpellcoreEntities
 import java.util.UUID
@@ -19,18 +16,24 @@ import java.util.UUID
 class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entity(entityType, level) {
 
     val vertices: MutableList<Vertex> = mutableListOf()
-    val internalEdges: MutableList<Edge> = mutableListOf()
-    val internalFaces: MutableList<Face> = mutableListOf()
-//    val interSpellEdges: MutableMap<SpellUUID, MutableList<Edge>> = mutableMapOf()
-//    val interSpellFaces: MutableMap<SpellUUID, MutableList<Face>> = mutableMapOf()
+    val edges: MutableList<Edge> = mutableListOf()
+    val faces: MutableList<Face> = mutableListOf()
+
+    var facesByEdge: Map<EdgeKey, List<Face>> = mutableMapOf()
+    var volumes: Map<List<Face>, Volume> = mutableMapOf()
+
+    val links: MutableMap<Vertex, TypedUUID<SpellLinkEntity>> = mutableMapOf()
 
     constructor(level: Level): this(SpellcoreEntities.SPELL_ENTITY, level)
 
     init {
         val (newVertices, newEdges, newFaces) = IcosphereGenerator.icosphere(2)
         vertices.addAll(newVertices.map { Vertex(it, Vec3.ZERO, 0.1) })
-        internalEdges.addAll(newEdges.map { Edge(vertices[it.first], vertices[it.second], (vertices[it.first].pos - vertices[it.second].pos).length()) })
-        internalFaces.addAll(newFaces.map { Face(vertices[it.first], vertices[it.second], vertices[it.third]) })
+        edges.addAll(newEdges.map { Edge(vertices[it.first], vertices[it.second], (vertices[it.first].pos - vertices[it.second].pos).length()) })
+        faces.addAll(newFaces.map { Face(vertices[it.first], vertices[it.second], vertices[it.third]) })
+
+        facesByEdge = Physics.comupteFacesByEdge(faces)
+        recomputeVolumes()
 
         SpellcoreAPI.LOGGER.debug(this.level)
         Physics.addSpellEntity(this.level, this)
@@ -76,6 +79,10 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
             vertex.pos -= centre
 
         setPos(position() + centre)
+    }
+
+    fun recomputeVolumes() {
+        TODO("Not yet implemented")
     }
 
     override fun readAdditionalSaveData(tag: CompoundTag) {
