@@ -65,6 +65,6 @@ class FaceTest {
         println(angleTo0 + angleTo1)
 
         println(angleToSelf)
-        println(angleToInverse)
+        println(angleToInverse) // TODO: currently having the problem where this is pi, not 2pi.
     }
 }

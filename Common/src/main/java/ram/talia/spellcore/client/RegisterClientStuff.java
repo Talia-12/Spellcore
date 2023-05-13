@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
+import ram.talia.spellcore.client.entity.SpellLinkRenderer;
 import ram.talia.spellcore.client.entity.SpellRenderer;
 import ram.talia.spellcore.common.lib.SpellcoreEntities;
 import ram.talia.spellcore.xplat.IClientXplatAbstractions;
@@ -13,6 +14,7 @@ public class RegisterClientStuff {
 		var x = IClientXplatAbstractions.INSTANCE;
 
 		x.registerEntityRenderer(SpellcoreEntities.SPELL_ENTITY, SpellRenderer::new);
+		x.registerEntityRenderer(SpellcoreEntities.SPELL_LINK_ENTITY, SpellLinkRenderer::new);
 	}
 
 	public static void registerBlockEntityRenderers(@NotNull BlockEntityRendererRegisterer registerer) {

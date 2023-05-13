@@ -47,21 +47,21 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
     }
 
     fun clientTick() {
-        val thisX = this.position().x
-        val thisY = this.position().y
-        val thisZ = this.position().z
-
-        for (vertex in vertices) {
-            level.addParticle(
-                ParticleTypes.BUBBLE,
-                (thisX + vertex.pos.x),
-                (thisY + vertex.pos.y),
-                (thisZ + vertex.pos.z),
-                0.0125, // * (random.nextDouble() - 0.5),
-                0.0125, // * (random.nextDouble() - 0.5),
-                0.0125, // * (random.nextDouble() - 0.5)
-            )
-        }
+//        val thisX = this.position().x
+//        val thisY = this.position().y
+//        val thisZ = this.position().z
+//
+//        for (vertex in vertices) {
+//            level.addParticle(
+//                ParticleTypes.BUBBLE,
+//                (thisX + vertex.pos.x),
+//                (thisY + vertex.pos.y),
+//                (thisZ + vertex.pos.z),
+//                0.0125, // * (random.nextDouble() - 0.5),
+//                0.0125, // * (random.nextDouble() - 0.5),
+//                0.0125, // * (random.nextDouble() - 0.5)
+//            )
+//        }
     }
 
     fun recenter() {
@@ -82,7 +82,7 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
     }
 
     fun recomputeVolumes() {
-        TODO("Not yet implemented")
+        // TODO
     }
 
     override fun readAdditionalSaveData(tag: CompoundTag) {

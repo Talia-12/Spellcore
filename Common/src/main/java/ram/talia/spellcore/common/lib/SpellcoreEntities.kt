@@ -7,6 +7,7 @@ import net.minecraft.world.entity.MobCategory
 import ram.talia.spellcore.api.SpellcoreAPI
 import ram.talia.spellcore.api.SpellcoreAPI.modLoc
 import ram.talia.spellcore.common.entities.SpellEntity
+import ram.talia.spellcore.common.entities.SpellLinkEntity
 import java.util.function.BiConsumer
 
 object SpellcoreEntities {
@@ -26,10 +27,19 @@ object SpellcoreEntities {
             .sized(0.5f, 0.5f)
             .clientTrackingRange(32)
             .updateInterval(1)
-            .build(SpellcoreAPI.MOD_ID + ":spell_entity")
     )
 
-    private fun <T : Entity?> register(id: String, type: EntityType<T>): EntityType<T> {
+    @JvmField
+    val SPELL_LINK_ENTITY: EntityType<SpellLinkEntity> = register(
+        "spell_link_entity",
+        EntityType.Builder.of(::SpellLinkEntity, MobCategory.MISC)
+            .sized(0.5f, 0.5f)
+            .clientTrackingRange(32)
+            .updateInterval(1)
+    )
+
+    private fun <T : Entity?> register(id: String, typeBuilder: EntityType.Builder<T>): EntityType<T> {
+        val type = typeBuilder.build(SpellcoreAPI.MOD_ID + ":" + id)
         val old: EntityType<*>? = ENTITIES.put(modLoc(id), type)
         require(old == null) { "Typo? Duplicate id $id" }
         return type

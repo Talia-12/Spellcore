@@ -35,6 +35,23 @@ data class Face(val p0: Vertex, val p1: Vertex, val p2: Vertex) {
 
     fun normal(): Vec3 = (p2 - p0).cross(p1 - p0).normalize()
 
+    /**
+     * Given an edge, return the vertex of this face not on that edge.
+     */
+    fun otherPoint(edge: EdgeKey): Vertex {
+        return when (edge) {
+            p0 to p1 -> p2
+            p1 to p0 -> p2
+            p1 to p2 -> p0
+            p2 to p1 -> p0
+            p2 to p0 -> p1
+            p0 to p2 -> p1
+            else -> { throw IllegalArgumentException("$edge was not one of the edges of $this") }
+        }
+    }
+
+    fun inverse(): Face = Face(p2, p1, p0)
+
     fun angleTo(other: Face, sharedEdge: EdgeKey): Double {
 //        assert(p0 == sharedEdge.first && p1 == sharedEdge.second ||
 //                p1 == sharedEdge.first && p2 == sharedEdge.second ||
@@ -44,21 +61,40 @@ data class Face(val p0: Vertex, val p1: Vertex, val p2: Vertex) {
         val alignedSharedEdge = if (sharedEdge in this.edges()) sharedEdge else (sharedEdge.second to sharedEdge.first)
 
         val edgeVec = (alignedSharedEdge.second - alignedSharedEdge.first).normalize()
+        val edgeMid = 0.5 * (alignedSharedEdge.second + alignedSharedEdge.first)
 
         // a point on the plane of this face, forming a vector with the shared edge perpendicular to it
-        val thisPoint = edgeVec.cross(this.normal()).normalize()
-        val otherPoint = edgeVec.cross(other.normal()).normalize()
-
-        println(thisPoint)
-        println(otherPoint)
+        val thisPointIntermediary = edgeVec.cross(this.normal())
+        val thisPoint = (this.otherPoint(sharedEdge).pos - edgeMid).dot(thisPointIntermediary).times(thisPointIntermediary).normalize()
+        val otherPointIntermediary = edgeVec.cross(this.normal())
+        val otherPoint = (other.otherPoint(sharedEdge).pos - edgeMid).dot(otherPointIntermediary).times(otherPointIntermediary).normalize()
 
         val dot = thisPoint.dot(otherPoint)
         val det = edgeVec.dot(thisPoint.cross(otherPoint))
 
-        println(dot)
-        println(det)
-
         return atan2(det, dot).let { if (it >= 0) it else it + 2*PI }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other != null &&
+                other is Face && ((
+                        other.p0 == this.p0 &&
+                        other.p1 == this.p1 &&
+                        other.p2 == this.p2
+                    ) || (
+                        other.p0 == this.p1 &&
+                        other.p1 == this.p2 &&
+                        other.p2 == this.p0
+                    ) || (
+                        other.p0 == this.p2 &&
+                        other.p1 == this.p0 &&
+                        other.p2 == this.p1
+                    )
+                )
+    }
+
+    override fun hashCode(): Int {
+        return p0.hashCode() + p1.hashCode() + p2.hashCode()
     }
 }
 
@@ -86,7 +122,7 @@ data class Shape private constructor(val faces: List<Face>) : List<Face> by face
 
                 // find all faces adjacent to the current face that haven't been explored yet, remove them from undiscoveredFaces and add them to toExplore.
                 for (edge in currentFace.edges()) {
-                    val toAdd = facesByEdge[edge]?.intersect(undiscoveredFaces) ?: throw RuntimeException("facesByEdge didn't contain entry for edge $edge of face $currentFace")
+                    val toAdd = facesByEdge[edge]?.intersect(undiscoveredFaces) ?: throw IllegalArgumentException("facesByEdge didn't contain entry for edge $edge of face $currentFace")
                     undiscoveredFaces.removeAll(toAdd)
                     toExplore.addAll(toAdd)
                 }
