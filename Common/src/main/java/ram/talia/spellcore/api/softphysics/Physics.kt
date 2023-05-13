@@ -1,37 +1,52 @@
 package ram.talia.spellcore.api.softphysics
 
+import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import ram.talia.spellcore.api.TypedUUID
+import ram.talia.spellcore.api.minus
 import ram.talia.spellcore.api.plus
 import ram.talia.spellcore.api.times
 import ram.talia.spellcore.common.entities.SpellEntity
+import ram.talia.spellcore.common.entities.SpellLinkEntity
 
 object Physics {
     const val OUTER_PRESSURE = 4.0
     const val OUTER_TEMPERATURE = 4.0
 
+    const val POINT_RADIUS = 0.005
+
+    const val ENERGY_LOSS_ON_COLLISION_LEVEL = 0.05
+    const val VELOCITY_FLOOR_AFTER_COLLISION = 0.00001 * 0.00001
+
     val spellEntitiesByLevel: MutableMap<Level, MutableList<TypedUUID<SpellEntity>>> = mutableMapOf()
+    val spellLinkEntitiesByLevel: MutableMap<Level, MutableList<TypedUUID<SpellLinkEntity>>> = mutableMapOf()
 
     fun addSpellEntity(level: Level, spell: SpellEntity) {
         spellEntitiesByLevel.computeIfAbsent(level) { _ -> mutableListOf() }.add(TypedUUID(spell))
     }
 
+    fun addSpellLinkEntity(level: Level, spellLink: SpellLinkEntity) {
+        spellLinkEntitiesByLevel.computeIfAbsent(level) { _ -> mutableListOf() }.add(TypedUUID(spellLink))
+    }
+
     @JvmStatic
-    fun runPhysicsTick() {
-        for ((level, spellEntityUUIDs) in spellEntitiesByLevel) {
-            val spellEntities = mutableListOf<SpellEntity>()
-            val allVertices = mutableListOf<Vertex>()
-            val allEdges = mutableListOf<Edge>()
-            val allFaces = mutableListOf<Face>()
+    fun runPhysicsTick(level: Level) {
+        val spellEntityUUIDs = spellEntitiesByLevel[level] ?: return
 
-            for (uuid in spellEntityUUIDs) {
-                val spell = level.entities.get(uuid.uuid) as? SpellEntity ?: continue
-                spellEntities.add(spell)
+        val spellEntities = mutableListOf<SpellEntity>()
+        val allVertices = mutableListOf<Vertex>()
+        val allEdges = mutableListOf<Edge>()
+        val allFaces = mutableListOf<Face>()
 
-                allVertices.addAll(spell.vertices)
-                allEdges.addAll(spell.edges)
-                allFaces.addAll(spell.faces)
+        for (uuid in spellEntityUUIDs) {
+            val spell = level.entities.get(uuid.uuid) as? SpellEntity ?: continue
+            spellEntities.add(spell)
+
+            allVertices.addAll(spell.vertices.map { it.pos += spell.position(); it })
+            allEdges.addAll(spell.edges)
+            allFaces.addAll(spell.faces)
 
 //                for ((otherUUID, edges) in spell.interSpellEdges) {
 //                    level.entities.get(otherUUID.uuid) as? SpellEntity ?: continue
@@ -41,14 +56,15 @@ object Physics {
 //                    level.entities.get(otherUUID.uuid) as? SpellEntity ?: continue
 //                    allFaces.addAll(faces)
 //                }
-            }
-
-            physicsStep(allVertices, allEdges, allFaces, 0.05, level)
-
-            for (entity in spellEntities)
-                entity.recenter()
         }
-    }
+
+        physicsStep(allVertices, allEdges, allFaces, 0.05, level)
+
+
+
+        for (entity in spellEntities)
+            entity.recenter(true)
+        }
 
     fun physicsStep(vertices: MutableList<Vertex>, edges: MutableList<Edge>, faces: MutableList<Face>, dT: Double, level: Level) {
 
@@ -59,7 +75,26 @@ object Physics {
 
 
         for (vertex in vertices) {
+            val preMovePos = vertex.pos
+
             vertex.applyForce(dT)
+
+            val result = level.clip(ClipContext(preMovePos, vertex.pos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null))
+
+            if (result.type != HitResult.Type.MISS) {
+                // TODO: maybe should just use velocity?
+                val attemptedDelta = (preMovePos - vertex.pos)
+
+                val normal = Vec3.atLowerCornerOf(result.direction.normal)
+                val outDirection = attemptedDelta - 2 * (attemptedDelta.dot(normal)) * normal
+                val outLength = (1 - ENERGY_LOSS_ON_COLLISION_LEVEL) * (attemptedDelta.length() - preMovePos.distanceTo(result.location))
+
+                vertex.pos = result.location + outLength * outDirection.normalize()
+                vertex.vel = (1 - ENERGY_LOSS_ON_COLLISION_LEVEL) * (vertex.vel - 2 * (vertex.vel.dot(normal)) * normal)
+
+                if (vertex.vel.lengthSqr() < VELOCITY_FLOOR_AFTER_COLLISION)
+                    vertex.vel = Vec3.ZERO
+            }
         }
     }
 

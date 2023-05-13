@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.resources.ResourceLocation
 import ram.talia.spellcore.api.RenderHelper
 import ram.talia.spellcore.api.SpellcoreAPI.modLoc
+import ram.talia.spellcore.api.softphysics.Physics.POINT_RADIUS
 import ram.talia.spellcore.common.entities.SpellEntity
 
 class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<SpellEntity>(context) {
@@ -26,15 +27,11 @@ class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Sp
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
 
         for (vertex in spell.vertices) {
-            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, RADIUS, 1f, 1f, 1f, 1f)
+            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, POINT_RADIUS, 1f, 1f, 1f, 1f)
         }
 
         for (face in spell.faces) {
             RenderHelper.renderLineTriangle(ps, vertexConsumer, face.p0.pos, face.p1.pos, face.p2.pos, 0.8f, 1f, 1f, 1f)
         }
-    }
-
-    companion object {
-        const val RADIUS = 0.005
     }
 }

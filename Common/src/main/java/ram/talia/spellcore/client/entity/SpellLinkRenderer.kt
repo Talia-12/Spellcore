@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.phys.Vec3
 import ram.talia.spellcore.api.*
 import ram.talia.spellcore.api.softphysics.Face
+import ram.talia.spellcore.api.softphysics.Physics.POINT_RADIUS
 import ram.talia.spellcore.api.softphysics.Vertex
 import ram.talia.spellcore.api.softphysics.toKey
 import ram.talia.spellcore.common.entities.SpellLinkEntity
@@ -30,10 +31,10 @@ class SpellLinkRenderer(context: EntityRendererProvider.Context) : EntityRendere
 
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
 
-        RenderHelper.renderPoint(ps, vertexConsumer, p0.pos, SpellRenderer.RADIUS, 1f, 0f, 0f, 1f)
-        RenderHelper.renderPoint(ps, vertexConsumer, p1.pos, SpellRenderer.RADIUS, 0f, 1f, 0f, 1f)
-        RenderHelper.renderPoint(ps, vertexConsumer, p2.pos, SpellRenderer.RADIUS, 0f, 0f, 1f, 1f)
-        RenderHelper.renderPoint(ps, vertexConsumer, p3.pos, SpellRenderer.RADIUS, 0f, 0.7f, 0.7f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, p0.pos, POINT_RADIUS, 1f, 0f, 0f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, p1.pos, POINT_RADIUS, 0f, 1f, 0f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, p2.pos, POINT_RADIUS, 0f, 0f, 1f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, p3.pos, POINT_RADIUS, 0f, 0.7f, 0.7f, 1f)
 
         RenderHelper.renderLineFace(ps, vertexConsumer, face0, 0.7f, 0.7f, 0f, 1f)
         RenderHelper.renderLineFace(ps, vertexConsumer, face1, 0.7f, 0f, 0.7f, 1f)
@@ -51,7 +52,7 @@ class SpellLinkRenderer(context: EntityRendererProvider.Context) : EntityRendere
         val otherPointIntermediary = edgeVec.cross(face1.normal())
         val otherPoint = (face1.otherPoint(sharedEdge).pos - edgeMid).dot(otherPointIntermediary).times(otherPointIntermediary).normalize()
 
-        RenderHelper.renderPoint(ps, vertexConsumer, edgeMid + thisPoint, SpellRenderer.RADIUS, 0.7f, 0.7f, 0f, 1f)
-        RenderHelper.renderPoint(ps, vertexConsumer, edgeMid + otherPoint, SpellRenderer.RADIUS, 0.7f, 0f, 0.7f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, edgeMid + thisPoint, POINT_RADIUS, 0.7f, 0.7f, 0f, 1f)
+        RenderHelper.renderPoint(ps, vertexConsumer, edgeMid + otherPoint, POINT_RADIUS, 0.7f, 0f, 0.7f, 1f)
     }
 }

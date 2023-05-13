@@ -68,7 +68,7 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 //        }
     }
 
-    fun recenter() {
+    fun recenter(override: Boolean) {
         if (vertices.size == 0)
             return
 
@@ -82,7 +82,10 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
         for (vertex in vertices)
             vertex.pos -= centre
 
-        setPos(position() + centre)
+        if (override)
+            setPos(centre)
+        else
+            setPos(position() + centre)
     }
 
     fun recomputeVolumes() {
