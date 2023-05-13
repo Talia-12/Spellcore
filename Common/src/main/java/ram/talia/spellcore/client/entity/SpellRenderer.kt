@@ -27,7 +27,7 @@ class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Sp
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
 
         for (vertex in spell.vertices) {
-            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, POINT_RADIUS, 1f, 1f, 1f, 1f)
+            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, POINT_RADIUS, 1f, if (vertex.collisionThisTick) 0f else 1f, if (vertex.collisionThisTick) 0f else 1f, 1f)
         }
 
         for (face in spell.faces) {

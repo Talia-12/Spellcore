@@ -31,8 +31,15 @@ object Physics {
         spellLinkEntitiesByLevel.computeIfAbsent(level) { _ -> mutableListOf() }.add(TypedUUID(spellLink))
     }
 
+    var lastTick: Long = 0
+
     @JvmStatic
     fun runPhysicsTick(level: Level) {
+        if (level.gameTime <= lastTick)
+            return
+
+        lastTick = level.gameTime
+
         val spellEntityUUIDs = spellEntitiesByLevel[level] ?: return
 
         val spellEntities = mutableListOf<SpellEntity>()
@@ -44,7 +51,7 @@ object Physics {
             val spell = level.entities.get(uuid.uuid) as? SpellEntity ?: continue
             spellEntities.add(spell)
 
-            allVertices.addAll(spell.vertices.map { it.pos += spell.position(); it })
+            allVertices.addAll(spell.vertices.map { it.pos += spell.position(); it.collisionThisTick = false; it })
             allEdges.addAll(spell.edges)
             allFaces.addAll(spell.faces)
 
@@ -82,6 +89,8 @@ object Physics {
             val result = level.clip(ClipContext(preMovePos, vertex.pos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null))
 
             if (result.type != HitResult.Type.MISS) {
+                vertex.collisionThisTick = true
+
                 // TODO: maybe should just use velocity?
                 val attemptedDelta = (preMovePos - vertex.pos)
 

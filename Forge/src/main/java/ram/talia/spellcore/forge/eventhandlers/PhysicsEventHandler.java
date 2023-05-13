@@ -4,6 +4,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ram.talia.spellcore.api.SpellcoreAPI;
 import ram.talia.spellcore.api.softphysics.Physics;
 
 public class PhysicsEventHandler {
@@ -18,8 +19,9 @@ public class PhysicsEventHandler {
 //        Physics.runPhysicsTick();
 //    }
 
-    @SubscribeEvent
-    public static void levelTick(TickEvent.LevelTickEvent event) {
-        Physics.runPhysicsTick(event.level);
-    }
+//    @SubscribeEvent
+//    public static void levelTick(TickEvent.LevelTickEvent event) {
+//        SpellcoreAPI.LOGGER.info(event.side);
+//        Physics.runPhysicsTick(event.level);
+//    }
 }

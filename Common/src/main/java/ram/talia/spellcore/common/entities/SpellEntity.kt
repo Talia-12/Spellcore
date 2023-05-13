@@ -46,6 +46,8 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 
         super.tick()
 
+        Physics.runPhysicsTick(this.level)
+
         if (this.level.isClientSide)
             clientTick()
     }

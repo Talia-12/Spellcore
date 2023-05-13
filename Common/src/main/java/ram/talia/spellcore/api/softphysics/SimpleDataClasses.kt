@@ -12,6 +12,8 @@ import kotlin.math.atan2
 data class Vertex(var pos: Vec3, var vel: Vec3, val mass: Double) {
     var force: Vec3 = Vec3.ZERO
 
+    var collisionThisTick = false
+
     operator fun plus(other: Vertex): Vec3 = this.pos + other.pos
     operator fun minus(other: Vertex): Vec3 = this.pos - other.pos
 
