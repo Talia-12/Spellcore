@@ -17,6 +17,7 @@ object Physics {
         spellEntitiesByLevel.computeIfAbsent(level) { _ -> mutableListOf() }.add(TypedUUID(spell))
     }
 
+    @JvmStatic
     fun runPhysicsTick() {
         for ((level, spellEntityUUIDs) in spellEntitiesByLevel) {
             val spellEntities = mutableListOf<SpellEntity>()
@@ -74,23 +75,77 @@ object Physics {
         return facesByEdge
     }
 
-    fun computeVolumes(vertices: List<Vertex>, edges: List<Edge>, faces: List<Face>): MutableList<MutableList<Face>> {
-        val volumesAssigned: MutableMap<Face, Int> = mutableMapOf()
-        val unassignedFaces = faces.toMutableList()
-        val volumes: MutableList<MutableList<Face>> = mutableListOf()
+    /**
+     * Takes the list of faces, and the map of edge keys to which faces are adjacent to that edge key
+     */
+    fun computeNextFaceByFaceAndEdge(faces: List<Face>, facesByEdge: Map<EdgeKey, List<Face>>): Map<Pair<Face, EdgeKey>, Face> {
+        val out = mutableMapOf<Pair<Face, EdgeKey>, Face>()
+
+        for (face in faces) {
+            for (edge in face.edges()) {
+                val others = facesByEdge[edge]?.toMutableList()?.apply { remove(face) } ?: throw IllegalArgumentException("facesByEdge must contain edge for face $face")
+
+                val traverseTo = when (others.size) {
+                    0 -> face.inverse() to face
+                    1 -> {
+                        val other = others.first()
+                        other to other.inverse()
+                    }
+                    else -> {
+                        val angles = others.map { it to face.angleTo(it, edge) }
+
+                        var min = angles.first()
+                        var max = angles.first()
+
+                        for ((other, angle) in angles) {
+                            if (angle < min.second)
+                                min = other to angle
+                            else if (angle > max.second)
+                                max = other to angle
+                        }
+
+                        min.first to max.first.inverse()
+                    }
+                }
+
+                out[face to edge] = traverseTo.first
+                out[face.inverse() to edge.inverse()] = traverseTo.second
+            }
+        }
+
+        return out
+    }
+
+    fun computeVolumes(vertices: List<Vertex>, edges: List<Edge>, faces: List<Face>, faceLinks: Map<Pair<Face, EdgeKey>, Face>): Pair<MutableList<Shape>, MutableList<Volume>> {
+        // the list of all unassigned faces; stored as a pair for the face and the side of the face, since each side of a face
+        // can be adjacent to a separate volume.
+        val unassignedFaces = faces.flatMap { listOf(it, it.inverse()) }.toMutableList()
+        val shapes: MutableList<Shape> = mutableListOf()
+        val unmergedVolumes: MutableList<Volume> = mutableListOf()
 
         while (unassignedFaces.isNotEmpty()) {
-            val seedFace = unassignedFaces.first()
+            val seedFace = unassignedFaces.removeFirst()
 
-            // if this is true, start assigning
-            val side = volumesAssigned[seedFace] == null
+            val shape = Shape.startShape(seedFace)
+            val volume = Volume(mutableListOf(), 0.0, 0.0, 0.0)
 
-            val volume = mutableListOf(seedFace)
+            shapes.add(shape)
+            volume.adjacentShapes.add(shape)
+            unmergedVolumes.add(volume)
 
-            // TODO: get all faces that should be assigned to that volume and add them.
+            val unexplored = seedFace.edges().map { seedFace to it }.toMutableList()
 
-            for (face in volume) {
-                volumesAssigned.merge(face, if (side) 1 else 2) { a, b -> a + b }
+            while (unexplored.isNotEmpty()) {
+                val (face, edge) = unexplored.removeFirst()
+                val next = faceLinks[face to edge] ?: throw IllegalArgumentException("${face to edge} not in $faceLinks")
+
+                // if next was in fact still unassigned, add it to the shape being built.
+                if (unassignedFaces.remove(next)) {
+                    unexplored.addAll(next.edges().mapNotNull { if (it != edge) next to it else null })
+                    shape.add(next)
+                    next.shape = shape
+                    next.outerVolume = volume
+                }
             }
         }
 

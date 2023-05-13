@@ -11,7 +11,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.registries.RegisterEvent;
 import org.apache.commons.lang3.tuple.Pair;
+import ram.talia.spellcore.api.softphysics.Physics;
 import ram.talia.spellcore.common.lib.SpellcoreEntities;
+import ram.talia.spellcore.forge.eventhandlers.PhysicsEventHandler;
 import thedarkcolour.kotlinforforge.KotlinModLoadingContext;
 import ram.talia.spellcore.api.SpellcoreAPI;
 import ram.talia.spellcore.api.config.SpellcoreConfig;
@@ -51,6 +53,8 @@ public class ForgeSpellcoreInitializer {
 		IEventBus evBus = MinecraftForge.EVENT_BUS;
 		
 		modBus.register(ForgeSpellcoreClientInitializer.class);
+
+		evBus.register(PhysicsEventHandler.class);
 	}
 	
 	// https://github.com/VazkiiMods/Botania/blob/1.18.x/Forge/src/main/java/vazkii/botania/forge/ForgeCommonInitializer.java

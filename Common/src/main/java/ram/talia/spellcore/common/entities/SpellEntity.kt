@@ -30,16 +30,20 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
         val (newVertices, newEdges, newFaces) = IcosphereGenerator.icosphere(2)
         vertices.addAll(newVertices.map { Vertex(it, Vec3.ZERO, 0.1) })
         edges.addAll(newEdges.map { Edge(vertices[it.first], vertices[it.second], (vertices[it.first].pos - vertices[it.second].pos).length()) })
-        faces.addAll(newFaces.map { Face(vertices[it.first], vertices[it.second], vertices[it.third]) })
+        faces.addAll(newFaces.map { Face.make(vertices[it.first], vertices[it.second], vertices[it.third]) })
 
         facesByEdge = Physics.comupteFacesByEdge(faces)
         recomputeVolumes()
 
-        SpellcoreAPI.LOGGER.debug(this.level)
-        Physics.addSpellEntity(this.level, this)
     }
 
     override fun tick() {
+        if (firstTick) {
+            Physics.addSpellEntity(this.level, this)
+            SpellcoreAPI.LOGGER.info("first!")
+            SpellcoreAPI.LOGGER.info(uuid)
+        }
+
         super.tick()
 
         if (this.level.isClientSide)

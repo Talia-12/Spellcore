@@ -11,6 +11,7 @@ import net.minecraft.world.phys.Vec3
 import ram.talia.spellcore.api.*
 import ram.talia.spellcore.api.softphysics.Face
 import ram.talia.spellcore.api.softphysics.Vertex
+import ram.talia.spellcore.api.softphysics.toKey
 import ram.talia.spellcore.common.entities.SpellLinkEntity
 
 class SpellLinkRenderer(context: EntityRendererProvider.Context) : EntityRenderer<SpellLinkEntity>(context) {
@@ -24,8 +25,8 @@ class SpellLinkRenderer(context: EntityRendererProvider.Context) : EntityRendere
         val p2 = Vertex(Vec3(0.0, -0.5, 1.0), Vec3.ZERO, 1.0)
         val p3 = Vertex(Vec3(-1.0, -0.5, 0.0), Vec3.ZERO, 1.0)
 
-        val face0 = Face(p0, p1, p2)
-        val face1 = Face(p3, p2, p1)
+        val face0 = Face.make(p0, p1, p2)
+        val face1 = Face.make(p3, p2, p1)
 
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
 
@@ -37,12 +38,12 @@ class SpellLinkRenderer(context: EntityRendererProvider.Context) : EntityRendere
         RenderHelper.renderLineFace(ps, vertexConsumer, face0, 0.7f, 0.7f, 0f, 1f)
         RenderHelper.renderLineFace(ps, vertexConsumer, face1, 0.7f, 0f, 0.7f, 1f)
 
-        val sharedEdge = p1 to p2
+        val sharedEdge = (p1 to p2).toKey()
 
-        val alignedSharedEdge = if (sharedEdge in face0.edges()) sharedEdge else (sharedEdge.second to sharedEdge.first)
+        val alignedSharedEdge = if (sharedEdge in face0.edges()) sharedEdge else (sharedEdge.p1 to sharedEdge.p0).toKey()
 
-        val edgeVec = (alignedSharedEdge.second - alignedSharedEdge.first).normalize()
-        val edgeMid = 0.5 * (alignedSharedEdge.second + alignedSharedEdge.first)
+        val edgeVec = (alignedSharedEdge.p1 - alignedSharedEdge.p0).normalize()
+        val edgeMid = 0.5 * (alignedSharedEdge.p1 + alignedSharedEdge.p0)
 
         // a point on the plane of this face, forming a vector with the shared edge perpendicular to it
         val thisPointIntermediary = edgeVec.cross(face0.normal())
