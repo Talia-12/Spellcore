@@ -1,0 +1,11 @@
+{
+  "_comment": "Patchi stuff",
+
+  "spellcore.landing": "I have always known that I have a soul, and yet it has not been useful for much except wanton destruction until now. Finally, I have found some notes that begin to explain how I can make use of this unseen limb to manipulate the world...",
+
+  "_comment": "Config Entries",
+  "text.autoconfig.spellcore.title": "Spellcore Configs",
+  "text.autoconfig.spellcore.category.common": "Common",
+  "text.autoconfig.spellcore.category.client": "Client",
+  "text.autoconfig.spellcore.category.server": "Server"
+}

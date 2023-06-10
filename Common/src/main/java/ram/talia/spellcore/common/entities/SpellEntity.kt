@@ -1,6 +1,5 @@
 package ram.talia.spellcore.common.entities
 
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
@@ -11,7 +10,6 @@ import net.minecraft.world.phys.Vec3
 import ram.talia.spellcore.api.*
 import ram.talia.spellcore.api.softphysics.*
 import ram.talia.spellcore.common.lib.SpellcoreEntities
-import java.util.UUID
 
 class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entity(entityType, level) {
 
@@ -34,11 +32,12 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 
         facesByEdge = Physics.comupteFacesByEdge(faces)
         recomputeVolumes()
-
     }
 
     override fun tick() {
         if (firstTick) {
+            vertices.forEach { it.pos += this.position() }
+
             Physics.addSpellEntity(this.level, this)
             SpellcoreAPI.LOGGER.info("first!")
             SpellcoreAPI.LOGGER.info(uuid)
@@ -46,7 +45,8 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 
         super.tick()
 
-        Physics.runPhysicsTick(this.level)
+        if (this.level.gameTime % 40 == 0L)
+            Physics.runPhysicsTick(this.level)
 
         if (this.level.isClientSide)
             clientTick()
@@ -70,9 +70,11 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 //        }
     }
 
-    fun recenter(override: Boolean) {
+    fun recenter() {
         if (vertices.size == 0)
             return
+
+        SpellcoreAPI.LOGGER.info("vertex 0: ${vertices[0].pos}")
 
         var centre = Vec3.ZERO
 
@@ -81,13 +83,10 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 
         centre /= vertices.size.toDouble()
 
-        for (vertex in vertices)
-            vertex.pos -= centre
+        SpellcoreAPI.LOGGER.info("new pos: $centre")
+        SpellcoreAPI.LOGGER.info("diff: ${vertices[0].pos - centre}")
 
-        if (override)
-            setPos(centre)
-        else
-            setPos(position() + centre)
+        setPos(centre)
     }
 
     fun recomputeVolumes() {
@@ -108,9 +107,5 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
 
     override fun getAddEntityPacket(): Packet<*> {
         return ClientboundAddEntityPacket(this)
-    }
-
-    data class SpellUUID private constructor(val uuid: UUID) {
-        constructor(spell: SpellEntity) : this(spell.uuid)
     }
 }

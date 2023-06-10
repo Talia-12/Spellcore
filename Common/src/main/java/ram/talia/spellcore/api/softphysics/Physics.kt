@@ -31,14 +31,14 @@ object Physics {
         spellLinkEntitiesByLevel.computeIfAbsent(level) { _ -> mutableListOf() }.add(TypedUUID(spellLink))
     }
 
-    var lastTick: Long = 0
+    var lastTick: MutableMap<Level, Long> = mutableMapOf()
 
     @JvmStatic
     fun runPhysicsTick(level: Level) {
-        if (level.gameTime <= lastTick)
+        if (level.gameTime <= lastTick.getOrDefault(level, 0))
             return
 
-        lastTick = level.gameTime
+        lastTick[level] = level.gameTime
 
         val spellEntityUUIDs = spellEntitiesByLevel[level] ?: return
 
@@ -51,7 +51,7 @@ object Physics {
             val spell = level.entities.get(uuid.uuid) as? SpellEntity ?: continue
             spellEntities.add(spell)
 
-            allVertices.addAll(spell.vertices.map { it.pos += spell.position(); it.collisionThisTick = false; it })
+            allVertices.addAll(spell.vertices.map { it.collisionThisTick = false; it })
             allEdges.addAll(spell.edges)
             allFaces.addAll(spell.faces)
 
@@ -70,7 +70,7 @@ object Physics {
 
 
         for (entity in spellEntities)
-            entity.recenter(true)
+            entity.recenter()
         }
 
     fun physicsStep(vertices: MutableList<Vertex>, edges: MutableList<Edge>, faces: MutableList<Face>, dT: Double, level: Level) {
@@ -92,7 +92,7 @@ object Physics {
                 vertex.collisionThisTick = true
 
                 // TODO: maybe should just use velocity?
-                val attemptedDelta = (preMovePos - vertex.pos)
+                val attemptedDelta = (vertex.pos - preMovePos)
 
                 val normal = Vec3.atLowerCornerOf(result.direction.normal)
                 val outDirection = attemptedDelta - 2 * (attemptedDelta.dot(normal)) * normal

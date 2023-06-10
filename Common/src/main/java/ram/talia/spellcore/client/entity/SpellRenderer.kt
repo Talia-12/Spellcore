@@ -7,9 +7,12 @@ import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.world.phys.Vec3
 import ram.talia.spellcore.api.RenderHelper
 import ram.talia.spellcore.api.SpellcoreAPI.modLoc
+import ram.talia.spellcore.api.minus
 import ram.talia.spellcore.api.softphysics.Physics.POINT_RADIUS
+import ram.talia.spellcore.api.softphysics.Vertex
 import ram.talia.spellcore.common.entities.SpellEntity
 
 class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<SpellEntity>(context) {
@@ -25,13 +28,16 @@ class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Sp
 //        val dimensionType = levelAccessor.dimensionType()
 //        val blockPos = BlockPos(camera.position.x, 0.0, camera.position.z)
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
+        RenderHelper.renderPoint(ps, vertexConsumer, Vec3.ZERO, POINT_RADIUS, 0f, 1f, 1f, 1f)
 
         for (vertex in spell.vertices) {
-            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, POINT_RADIUS, 1f, if (vertex.collisionThisTick) 0f else 1f, if (vertex.collisionThisTick) 0f else 1f, 1f)
+            RenderHelper.renderPoint(ps, vertexConsumer, localPos(vertex, spell), POINT_RADIUS, 1f, if (vertex.collisionThisTick) 0f else 1f, if (vertex.collisionThisTick) 0f else 1f, 1f)
         }
 
         for (face in spell.faces) {
-            RenderHelper.renderLineTriangle(ps, vertexConsumer, face.p0.pos, face.p1.pos, face.p2.pos, 0.8f, 1f, 1f, 1f)
+            RenderHelper.renderLineTriangle(ps, vertexConsumer, localPos(face.p0, spell), localPos(face.p1, spell), localPos(face.p2, spell), 0.8f, 1f, 1f, 1f)
         }
     }
+
+    fun localPos(vertex: Vertex, spell: SpellEntity): Vec3 = vertex.pos - spell.position()
 }
