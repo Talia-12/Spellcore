@@ -30,14 +30,17 @@ class SpellRenderer(context: EntityRendererProvider.Context) : EntityRenderer<Sp
         val vertexConsumer: VertexConsumer = bufferSource.getBuffer(RenderType.lines())
         RenderHelper.renderPoint(ps, vertexConsumer, Vec3.ZERO, POINT_RADIUS, 0f, 1f, 1f, 1f)
 
+        ps.pushPose()
+        ps.translate(-spell.x, -spell.y, -spell.z)
+
         for (vertex in spell.vertices) {
-            RenderHelper.renderPoint(ps, vertexConsumer, localPos(vertex, spell), POINT_RADIUS, 1f, if (vertex.collisionThisTick) 0f else 1f, if (vertex.collisionThisTick) 0f else 1f, 1f)
+            RenderHelper.renderPoint(ps, vertexConsumer, vertex.pos, POINT_RADIUS, 1f, if (vertex.collisionThisTick) 0f else 1f, if (vertex.collisionThisTick) 0f else 1f, 1f)
         }
 
         for (face in spell.faces) {
-            RenderHelper.renderLineTriangle(ps, vertexConsumer, localPos(face.p0, spell), localPos(face.p1, spell), localPos(face.p2, spell), 0.8f, 1f, 1f, 1f)
+            RenderHelper.renderLineTriangle(ps, vertexConsumer, face.p0.pos, face.p1.pos, face.p2.pos, 0.8f, 1f, 1f, 1f)
         }
-    }
 
-    fun localPos(vertex: Vertex, spell: SpellEntity): Vec3 = vertex.pos - spell.position()
+        ps.popPose()
+    }
 }
