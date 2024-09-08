@@ -38,14 +38,15 @@ class SpellEntity(entityType: EntityType<out SpellEntity>, level: Level) : Entit
         if (firstTick) {
             vertices.forEach { it.pos += this.position() }
 
-            Physics.addSpellEntity(this.level, this)
+            if (!this.level.isClientSide)
+                Physics.addSpellEntity(this.level, this)
             SpellcoreAPI.LOGGER.info("first!")
             SpellcoreAPI.LOGGER.info(uuid)
         }
 
         super.tick()
 
-        if (this.level.gameTime % 40 == 0L)
+        if (this.level.gameTime % 40 == 0L && !this.level.isClientSide)
             Physics.runPhysicsTick(this.level)
 
         if (this.level.isClientSide)
